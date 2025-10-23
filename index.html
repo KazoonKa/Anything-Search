@@ -124,13 +124,13 @@
             justify-content: center;
             width: 2.5rem;
             height: 2.5rem;
-            background-color: #2563eb; /* Blue background */
+            background-color: #4b5563; /* Neutral gray theme */
             border-radius: 9999px; /* Full roundness */
             color: #ffffff;
             transition: all 0.3s ease;
         }
         #themeToggle:hover {
-            background-color: #1d4ed8; /* Darker blue on hover */
+            background-color: #374151; /* Darker gray on hover */
         }
         .toggle-icon {
             transition: transform 0.3s ease;
@@ -155,14 +155,14 @@
             justify-content: center;
             width: 2.5rem;
             height: 2.5rem;
-            background-color: #2563eb; /* Blue background */
+            background-color: #4b5563; /* Neutral gray theme */
             border-radius: 9999px; /* Full roundness */
             color: #ffffff;
             text-decoration: none;
             transition: all 0.3s ease;
         }
         .github-button:hover {
-            background-color: #1d4ed8; /* Darker blue on hover */
+            background-color: #374151; /* Darker gray on hover */
         }
         .github-button i {
             font-size: 1.5rem;
@@ -209,7 +209,7 @@
         }
     </script>
 </head>
-<body class="light-mode min-h-screen flex flex-col items-center justify-center relative">
+<body class="dark-mode min-h-screen flex flex-col items-center justify-center relative">
     <div class="top-buttons">
         <button id="themeToggle" class="p-2 focus:outline-none" aria-label="Toggle theme">
             <svg class="toggle-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -305,9 +305,9 @@
 
         // Load saved theme
         const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.remove('light-mode');
-            document.body.classList.add('dark-mode');
+        if (savedTheme === 'light') {
+            document.body.classList.remove('dark-mode');
+            document.body.classList.add('light-mode');
         }
     </script>
 </body>
