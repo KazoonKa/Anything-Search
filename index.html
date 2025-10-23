@@ -1,0 +1,318 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anything Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> <!-- Font Awesome for icon -->
+    <style>
+        body.light-mode {
+            background-color: #e5e7eb; /* Light gray with a slight white tint */
+            color: #000000; /* Black text */
+        }
+        body.dark-mode {
+            background-color: #1a1a1a; /* Near-black with slight gray for dark mode */
+            color: #f3f4f6;
+        }
+        body {
+            font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+        .search-container {
+            transition: all 0.3s ease;
+        }
+        .light-mode input[type="text"],
+        .light-mode select {
+            background-color: #1f2937; /* Dark background for input/select in light mode */
+            color: #f3f4f6; /* Light text for input/select in light mode */
+            border-color: #4b5563;
+        }
+        .dark-mode input[type="text"],
+        .dark-mode select {
+            background-color: #111827; /* Slightly darker for dark mode */
+            color: #f3f4f6;
+            border-color: #374151;
+        }
+        input[type="text"],
+        select {
+            transition: all 0.3s ease;
+            -webkit-appearance: none; /* Remove default browser styling */
+            -moz-appearance: none;
+            appearance: none;
+            border-radius: 1.5rem; /* More rounded corners */
+            padding: 0.75rem 1.25rem; /* Consistent height and padding */
+            font-size: 1rem; /* Match font size for consistency */
+            height: 3rem; /* Consistent height with search bar */
+        }
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f3f4f6' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5em;
+            width: 100%;
+            text-align: center; /* Center the dropdown text */
+        }
+        .light-mode select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f3f4f6' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+        }
+        .dark-mode select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f3f4f6' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+        }
+        option {
+            text-align: center; /* Center the text within each option */
+            display: flex; /* Use flex to align logo and text */
+            align-items: center; /* Vertically center items */
+            justify-content: center; /* Horizontally center items */
+            padding: 0.25rem 0; /* Add some padding for spacing */
+        }
+        button {
+            transition: all 0.3s ease;
+            border-radius: 1.5rem; /* More rounded button */
+            padding: 0.75rem; /* Adjusted padding for icon-only */
+            font-size: 1rem; /* Match input/select font size */
+            height: 3rem; /* Consistent height with search bar */
+            width: 3rem; /* Fixed width for icon-only button */
+            background-color: #2563eb; /* Blue background */
+            color: #ffffff; /* White icon */
+        }
+        button:hover {
+            background-color: #1d4ed8; /* Darker blue on hover */
+        }
+        #themeToggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem; /* Adjusted to fit icon better */
+            height: 2.5rem; /* Adjusted to fit icon better */
+        }
+        .toggle-icon {
+            transition: transform 0.3s ease;
+            margin: 0; /* Remove any default margin */
+            padding: 0; /* Remove any default padding */
+            width: 1.5rem; /* Slightly smaller to fit centered */
+            height: 1.5rem; /* Slightly smaller to fit centered */
+        }
+        .dark-mode .toggle-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+    <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+          if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+              try {
+                  var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                  var firstSheetName = workbook.SheetNames[0];
+                  var worksheet = workbook.Sheets[firstSheetName];
+
+                  // Convert sheet to JSON to filter blank rows
+                  var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                  // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                  var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                  // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                  var headerRowIndex = filteredData.findIndex((row, index) =>
+                    row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                  );
+                  // Fallback
+                  if (headerRowIndex === -1 || headerRowIndex > 25) {
+                    headerRowIndex = 0;
+                  }
+
+                  // Convert filtered JSON back to CSV
+                  var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                  csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                  return csv;
+              } catch (e) {
+                  console.error(e);
+                  return "";
+              }
+          }
+          return gk_fileData[filename] || "";
+        }
+    </script>
+</head>
+<body class="light-mode min-h-screen flex flex-col items-center justify-center relative">
+    <div class="absolute top-4 left-4">
+        <button id="themeToggle" class="p-2 rounded-full bg-gray-700 dark:bg-gray-800 text-gray-200 dark:text-gray-300 focus:outline-none" aria-label="Toggle theme">
+            <svg class="toggle-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+        </button>
+    </div>
+    <h1 class="text-5xl font-bold mb-8 tracking-tight">Anything</h1>
+    <div class="search-container w-full max-w-lg space-y-4 mx-auto">
+        <div class="flex space-x-4">
+            <input type="text" id="searchInput" placeholder="Search for anything..." autocomplete="off" class="flex-1 border focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm" aria-label="Search">
+            <button onclick="performSearch()" class="border focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-md">
+                <i class="fas fa-search"></i> <!-- Font Awesome magnifying glass icon -->
+            </button>
+        </div>
+        <div class="flex justify-center">
+            <select id="searchEngine" class="w-auto min-w-[200px] border cursor-pointer shadow-sm" aria-label="Select search engine">
+                <option value="google">
+                    <span style="display: flex; align-items: center; gap: 0.5rem;">
+                        <img src="https://logos-world.net/wp-content/uploads/2020/09/Google-Logo.png" alt="Google" style="width: 24px; height: 24px;">
+                        Google
+                    </span>
+                </option>
+                <option value="yahoo">
+                    <span style="display: flex; align-items: center; gap: 0.5rem;">
+                        <img src="https://logos-world.net/wp-content/uploads/2021/02/Yahoo-Logo.png" alt="Yahoo" style="width: 24px; height: 24px;">
+                        Yahoo
+                    </span>
+                </option>
+                <option value="bing">
+                    <span style="display: flex; align-items: center; gap: 0.5rem;">
+                        <img src="https://logos-world.net/wp-content/uploads/2021/02/Bing-Logo.png" alt="Bing" style="width: 24px; height: 24px;">
+                        Bing
+                    </span>
+                </option>
+                <option value="duckduckgo">
+                    <span style="display: flex; align-items: center; gap: 0.5rem;">
+                        <img src="https://logos-world.net/wp-content/uploads/2021/03/DuckDuckGo-Logo.png" alt="DuckDuckGo" style="width: 24px; height: 24px;">
+                        DuckDuckGo
+                    </span>
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <script>
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            const engine = document.getElementById('searchEngine').value;
+            if (!query) {
+                alert('Please enter a search query');
+                return;
+            }
+
+            let searchUrl;
+            switch (engine) {
+                case 'google':
+                    searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                    break;
+                case 'yahoo':
+                    searchUrl = `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`;
+                    break;
+                case 'bing':
+                    searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+                    break;
+                case 'duckduckgo':
+                    searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+                    break;
+                default:
+                    searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            }
+
+            window.open(searchUrl, '_blank');
+        }
+
+        // Allow pressing Enter to trigger search
+        document.getElementById('searchInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.remove('light-mode');
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+</body>
+</html>
