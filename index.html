@@ -37,45 +37,6 @@
         }
         return gk_fileData[filename] || "";
         }
-        </script><script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
         </script><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -161,8 +122,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 2.5rem; /* Adjusted to fit icon better */
-            height: 2.5rem; /* Adjusted to fit icon better */
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: #2563eb; /* Blue background */
+            border-radius: 9999px; /* Full roundness */
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+        #themeToggle:hover {
+            background-color: #1d4ed8; /* Darker blue on hover */
         }
         .toggle-icon {
             transition: transform 0.3s ease;
@@ -173,6 +141,31 @@
         }
         .dark-mode .toggle-icon {
             transform: rotate(180deg);
+        }
+        .top-buttons {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            display: flex;
+            gap: 0.5rem; /* Space between buttons */
+        }
+        .github-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: #2563eb; /* Blue background */
+            border-radius: 9999px; /* Full roundness */
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .github-button:hover {
+            background-color: #1d4ed8; /* Darker blue on hover */
+        }
+        .github-button i {
+            font-size: 1.5rem;
         }
     </style>
     <script type="text/javascript">
@@ -217,12 +210,15 @@
     </script>
 </head>
 <body class="light-mode min-h-screen flex flex-col items-center justify-center relative">
-    <div class="absolute top-4 left-4">
-        <button id="themeToggle" class="p-2 rounded-full bg-gray-700 dark:bg-gray-800 text-gray-200 dark:text-gray-300 focus:outline-none" aria-label="Toggle theme">
+    <div class="top-buttons">
+        <button id="themeToggle" class="p-2 focus:outline-none" aria-label="Toggle theme">
             <svg class="toggle-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
             </svg>
         </button>
+        <a href="https://github.com/KazoonKa/Anything-Search" target="_blank" class="github-button">
+            <i class="fab fa-github"></i>
+        </a>
     </div>
     <h1 class="text-5xl font-bold mb-8 tracking-tight">Anything</h1>
     <div class="search-container w-full max-w-lg space-y-4 mx-auto">
